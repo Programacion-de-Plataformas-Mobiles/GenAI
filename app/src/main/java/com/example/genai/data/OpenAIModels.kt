@@ -3,11 +3,9 @@ package com.example.genai.data
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-// --- Request Models (for Retrofit with Moshi) ---
-
 @JsonClass(generateAdapter = true)
 data class OpenAIRequest(
-    @Json(name = "model") val model: String = "gpt-3.5-turbo-1106",
+    @Json(name = "model") val model: String = "gpt-4o",
     @Json(name = "messages") val messages: List<OpenAIMessage>,
     @Json(name = "response_format") val responseFormat: ResponseFormat = ResponseFormat()
 )
@@ -23,9 +21,6 @@ data class ResponseFormat(
     @Json(name = "type") val type: String = "json_object"
 )
 
-// --- Response Models (for Retrofit with Moshi) ---
-
-// This is the outer shell of the API's response
 @JsonClass(generateAdapter = true)
 data class OpenAIResponse(
     @Json(name = "choices") val choices: List<Choice>
@@ -34,4 +29,18 @@ data class OpenAIResponse(
 @JsonClass(generateAdapter = true)
 data class Choice(
     @Json(name = "message") val message: OpenAIMessage
+)
+
+@JsonClass(generateAdapter = true)
+data class BaymaxResponse(
+    @Json(name = "spoken_response") val spokenResponse: String,
+    @Json(name = "user_sentiment") val userSentiment: String,
+    @Json(name = "recommendation") val recommendation: MedicalRecommendation? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class MedicalRecommendation(
+    @Json(name = "item_name") val itemName: String,
+    @Json(name = "estimated_price_gtq") val priceGTQ: Double
+    // Se ha eliminado imageUrl
 )

@@ -66,6 +66,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.22")
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Retrofit & Moshi (using reflection)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

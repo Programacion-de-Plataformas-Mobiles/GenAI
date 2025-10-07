@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:propertyName="pathData"
+    android:duration="1000"
+    android:valueFrom="M 50,50 L 50,50"
+    android:valueTo="M 40,50 L 60,50"
+    android:interpolator="@android:interpolator/accelerate_decelerate" />

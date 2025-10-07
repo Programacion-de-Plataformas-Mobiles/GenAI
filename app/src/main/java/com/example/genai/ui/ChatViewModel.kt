@@ -19,9 +19,18 @@ class ChatViewModel : ViewModel() {
     val state: StateFlow<ChatState> = _state.asStateFlow()
 
     init {
-        // Iniciar la conversación con un saludo en español
-        val startingMessage = Message("bot", "¡Hola! Soy tu agente inmobiliario virtual. ¿Qué tipo de propiedad estás buscando hoy?", "now")
-        _state.value = ChatState(messages = listOf(startingMessage))
+        viewModelScope.launch {
+             _state.value = _state.value.copy(isLoading = true)
+            val baymaxResponse = openAIRepository.getBaymaxStructuredResponse(emptyList())
+            if (baymaxResponse != null) {
+                val baymaxGreeting = Message("bot", baymaxResponse.spokenResponse, "now")
+                _state.value = ChatState(messages = listOf(baymaxGreeting))
+            } else {
+                val errorMessage = Message("bot", "Parece que hay un problema de conexión.", "now")
+                _state.value = ChatState(messages = listOf(errorMessage))
+            }
+             _state.value = _state.value.copy(isLoading = false)
+        }
     }
 
     fun onEvent(event: ChatEvent) {
@@ -38,26 +47,21 @@ class ChatViewModel : ViewModel() {
             val currentMessages = _state.value.messages
             _state.value = _state.value.copy(messages = currentMessages + currentUserMessage, isLoading = true)
 
-            // Preparar el historial de la conversación para la API
-            val history = (currentMessages + currentUserMessage)
-                .takeLast(10) // Tomar los últimos 10 mensajes
-                .map {
-                    val role = if (it.author == "bot") "assistant" else it.author
-                    OpenAIMessage(role = role, content = it.content)
-                }
+            val history = (currentMessages + currentUserMessage).takeLast(10).map {
+                val role = if (it.author == "bot") "assistant" else it.author
+                OpenAIMessage(role = role, content = it.content)
+            }
 
-            // Obtener la respuesta estructurada de OpenAI
-            val realEstateResponse = openAIRepository.getStructuredChatCompletion(history)
+            val baymaxResponse = openAIRepository.getBaymaxStructuredResponse(history)
 
-            if (realEstateResponse != null) {
-                Log.d("OpenAIStructuredResponse", realEstateResponse.toString())
+            if (baymaxResponse != null) {
+                Log.d("BaymaxSentimentAnalysis", "Detected sentiment: ${baymaxResponse.userSentiment}")
 
-                // Crear un nuevo mensaje del bot con el resumen y la lista de propiedades
                 val newBotMessage = Message(
                     author = "bot",
-                    content = realEstateResponse.agentSummary,
+                    content = baymaxResponse.spokenResponse,
                     timestamp = "now",
-                    propertyListings = realEstateResponse.propertyListings
+                    recommendation = baymaxResponse.recommendation // Adjuntar la recomendación
                 )
 
                 _state.value = _state.value.copy(
@@ -65,7 +69,7 @@ class ChatViewModel : ViewModel() {
                     isLoading = false
                 )
             } else {
-                val errorMessage = Message("bot", "Lo siento, no pude procesar tu solicitud. Por favor, inténtalo de nuevo.", "now")
+                val errorMessage = Message("bot", "Lo siento, no pude procesar tu solicitud.", "now")
                 _state.value = _state.value.copy(
                     messages = _state.value.messages + errorMessage,
                     isLoading = false

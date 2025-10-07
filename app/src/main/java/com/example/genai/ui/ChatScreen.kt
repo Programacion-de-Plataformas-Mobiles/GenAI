@@ -1,11 +1,13 @@
 package com.example.genai.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -13,43 +15,44 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ChatScreen(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier, // Este modifier YA contiene el padding del Scaffold
     viewModel: ChatViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
 
-    Column(modifier = modifier.fillMaxSize().imePadding()) {
+    LaunchedEffect(state.messages.size) {
+        if (state.messages.isNotEmpty()) {
+            listState.animateScrollToItem(state.messages.size - 1)
+        }
+    }
+
+    // Aplicamos el modifier del Scaffold a la Columna principal
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .imePadding() // Y añadimos el padding para el teclado
+    ) {
+        // La lista de mensajes ocupa todo el espacio disponible, encogiéndose cuando aparece el teclado
         LazyColumn(
             state = listState,
-            modifier = Modifier.weight(1f),
-            reverseLayout = true
+            modifier = Modifier.weight(1f)
         ) {
-            items(state.messages.reversed()) { message ->
+            items(state.messages) { message ->
                 MessageBubble(message = message)
-
-                // Display property cards if they exist
-                message.propertyListings?.let {
-                    it.forEach { property ->
-                        PropertyCard(property = property)
-                    }
+                message.recommendation?.let {
+                    MedicalRecommendationCard(recommendation = it)
                 }
             }
         }
 
-        // Show a loading indicator at the bottom while waiting for a response
-        if (state.isLoading) {
+        if (state.isLoading && state.messages.isNotEmpty()) {
             TypingIndicator()
         }
 
         ChatInput { message ->
             viewModel.onEvent(ChatEvent.SendMessage(message))
-            coroutineScope.launch {
-                if (state.messages.isNotEmpty()) {
-                    listState.animateScrollToItem(0)
-                }
-            }
         }
     }
 }
