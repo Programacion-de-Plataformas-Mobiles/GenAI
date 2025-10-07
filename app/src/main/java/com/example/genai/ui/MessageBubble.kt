@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,7 +29,10 @@ fun MessageBubble(message: Message) {
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
-                .background(if (isUserMessage) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
+                .background(
+                    if (isUserMessage) MaterialTheme.colorScheme.primary
+                    else Color(0xFFDDDDEE)
+                )
                 .padding(16.dp)
         ) {
             Text(

@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun TypingIndicator() {
@@ -16,9 +17,10 @@ fun TypingIndicator() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "El agente está escribiendo...",
+            text = "Baymax está escribiendo...",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            fontSize = 15.sp,
         )
     }
 }
