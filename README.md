@@ -7,3 +7,6 @@ En un chat tipo Baymax que ayuda con el cuidado personal, te recomienda medicame
 
 Link del repo:
 https://github.com/Programacion-de-Plataformas-Mobiles/GenAI
+
+Link del video:
+https://youtube.com/shorts/49NAlodrVlg?feature=share
